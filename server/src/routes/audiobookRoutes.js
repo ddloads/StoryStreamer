@@ -1,9 +1,21 @@
 // server/src/routes/audiobookRoutes.js
 import express from 'express';
-import { getAudiobooks, getAudiobook, addAudiobook, updateAudiobook, deleteAudiobook } from '../controllers/audiobookController.js';
+import { 
+  getAudiobooks, 
+  getAudiobook, 
+  addAudiobook, 
+  updateAudiobook, 
+  deleteAudiobook, 
+  scanLibrary,
+  getRecentAudiobooks,
+  getRecommendedAudiobooks 
+} from '../controllers/audiobookController.js';
 
 const router = express.Router();
 
+router.get('/scan', scanLibrary);
+router.get('/recent', getRecentAudiobooks); // Add this line
+router.get('/recommended', getRecommendedAudiobooks); // Add this line
 router.get('/', getAudiobooks);
 router.get('/:id', getAudiobook);
 router.post('/', addAudiobook);

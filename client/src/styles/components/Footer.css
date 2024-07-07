@@ -1,0 +1,22 @@
+/* client/src/styles/components/Footer.css */
+footer {
+    background-color: #1e1e1e;
+    padding: 1rem;
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+  }
+  
+  .footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  footer p {
+    color: #bb86fc;
+    margin: 0;
+  }
+  

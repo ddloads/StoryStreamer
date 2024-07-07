@@ -1,44 +1,51 @@
 // client/src/pages/Login.js
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../firebase';
+import '../styles/pages/Login.css';
 
 const Login = () => {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const response = await fetch('/api/users/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ username, password }),
-    });
-    const data = await response.json();
-    if (data.token) {
-      localStorage.setItem('token', data.token);
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
       navigate('/');
-    } else {
-      alert('Invalid credentials');
+    } catch (error) {
+      alert('Failed to login: ' + error.message);
     }
   };
 
   return (
     <div className="login">
-      <h1>Login</h1>
+      <h1>Enter the realm of StoryStreamer</h1>
       <form onSubmit={handleSubmit}>
         <label>
-          Username:
-          <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} />
+          <span>Email:</span>
+          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
         </label>
         <label>
-          Password:
-          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+          <span>Password:</span>
+          <div className="password-input">
+            <input
+              type={showPassword ? 'text' : 'password'}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <i
+              className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}
+              onClick={() => setShowPassword(!showPassword)}
+            ></i>
+          </div>
         </label>
         <button type="submit">Login</button>
       </form>
+      <button onClick={() => navigate('/register')}>Register</button>
     </div>
   );
 };

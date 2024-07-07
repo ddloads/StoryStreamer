@@ -1,0 +1,89 @@
+/* client/src/styles/pages/Register.css */
+.register {
+  max-width: 400px;
+  margin: 5rem auto;
+  padding: 2rem;
+  background-color: #1e1e1e;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.register h1 {
+  color: #bb86fc;
+  margin-bottom: 1rem;
+}
+
+.register p {
+  color: #ffffff;
+  margin-bottom: 1rem;
+}
+
+.register form {
+  display: flex;
+  flex-direction: column;
+}
+
+.register form label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #ffffff;
+  margin-bottom: 1rem;
+}
+
+.register form label span {
+  margin-right: 1rem;
+}
+
+.register form input {
+  padding: 0.5rem;
+  border: 1px solid #bb86fc;
+  border-radius: 4px;
+  background-color: #121212;
+  color: #ffffff;
+  flex-grow: 1;
+}
+
+.register form button {
+  margin-top: 1rem;
+  background-color: #bb86fc;
+  color: #121212;
+  border: none;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
+
+.register form button:hover {
+  background-color: #3700b3;
+}
+
+.register button {
+  background-color: transparent;
+  border: none;
+  color: #03dac6;
+  cursor: pointer;
+  text-decoration: underline;
+  margin-top: 1rem;
+}
+
+.register button:hover {
+  color: #bb86fc;
+}
+.password-input {
+  display: flex;
+  align-items: center;
+}
+
+.password-input input {
+  flex-grow: 1;
+}
+
+.password-input i {
+  margin-left: -30px;
+  cursor: pointer;
+  color: #bb86fc;
+}
+
+.password-input i:hover {
+  color: #3700b3;
+}

@@ -1,11 +1,17 @@
 // client/src/index.js
 import React from 'react';
-import ReactDOM from 'react-dom/client';
+import { createRoot } from 'react-dom/client';
 import App from './App';
+import { AuthProvider } from './context/AuthContext';
+import './styles/App.css';
+import '@fortawesome/fontawesome-free/css/all.min.css';
 
-const root = ReactDOM.createRoot(document.getElementById('root')); // Updated to use createRoot
+const container = document.getElementById('root');
+const root = createRoot(container);
 root.render(
   <React.StrictMode>
-    <App />
+    <AuthProvider>
+      <App />
+    </AuthProvider>
   </React.StrictMode>
 );

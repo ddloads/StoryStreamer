@@ -4,27 +4,45 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Home from './pages/Home';
-import AudiobookDetail from './pages/AudiobookDetail';
-import Profile from './pages/Profile';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import AudiobookDetail from './pages/AudiobookDetail';
+import Library from './pages/Library';
+import ProtectedRoute from './components/ProtectedRoute';
 
 const App = () => {
   return (
     <Router>
-      <div className="app">
-        <Header />
-        <main>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/audiobook/:id" element={<AudiobookDetail />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-          </Routes>
-        </main>
-        <Footer />
-      </div>
+      <Header />
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route 
+          path="/" 
+          element={
+            <ProtectedRoute>
+              <Home />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/audiobooks/:id" 
+          element={
+            <ProtectedRoute>
+              <AudiobookDetail />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/library" 
+          element={
+            <ProtectedRoute>
+              <Library />
+            </ProtectedRoute>
+          } 
+        />
+      </Routes>
+      <Footer />
     </Router>
   );
 };

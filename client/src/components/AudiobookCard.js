@@ -1,15 +1,21 @@
- // client/src/components/AudiobookCard.js
+// client/src/components/AudiobookCard.js
 import React from 'react';
 import { Link } from 'react-router-dom';
+import '../styles/components/AudiobookCard.css';
 
 const AudiobookCard = ({ audiobook }) => {
+  const coverImageUrl = audiobook.coverImage ? `${audiobook.coverImage}` : `${process.env.PUBLIC_URL}/images/book-cover-placeholder.png`;
+
   return (
-    <div className="audiobook-card">
-      <img src={audiobook.coverImage} alt={audiobook.title} />
-      <h3>{audiobook.title}</h3>
-      <p>{audiobook.author}</p>
-      <Link to={`/audiobook/${audiobook._id}`}>More Details</Link>
-    </div>
+    <Link to={`/audiobooks/${audiobook._id}`} className="audiobook-link">
+      <div className="audiobook-card">
+        <img src={coverImageUrl} alt={audiobook.title} className="cover-image" />
+        <div className="audiobook-info">
+          <h3 className="title">{audiobook.title}</h3>
+          <p className="author">{audiobook.author}</p>
+        </div>
+      </div>
+    </Link>
   );
 };
 

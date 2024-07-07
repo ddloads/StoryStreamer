@@ -1,0 +1,65 @@
+/* client/src/styles/pages/AudiobookDetail.css */
+.audiobook-detail {
+    display: flex;
+    padding: 2rem;
+    background-color: #1e1e1e;
+    color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  }
+  
+  .cover-section {
+    flex: 1;
+    padding-right: 2rem;
+  }
+  
+  .cover-section img {
+    width: 100%;
+    border-radius: 8px;
+  }
+  
+  .info-section {
+    flex: 3;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .info-section h1 {
+    color: #bb86fc;
+    margin-bottom: 0.5rem;
+  }
+  
+  .info-section h2 {
+    color: #fff;
+    margin-bottom: 1rem;
+  }
+  
+  .info-section p {
+    margin: 0.5rem 0;
+  }
+  
+  .progress-section {
+    margin-top: 1rem;
+  }
+  
+  .play-section {
+    margin-top: 1rem;
+  }
+  
+  .play-button {
+    background-color: #bb86fc;
+    color: #121212;
+    border: none;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+  
+  .play-button:hover {
+    background-color: #3700b3;
+  }
+  
+  .description-section {
+    margin-top: 1rem;
+  }
+  

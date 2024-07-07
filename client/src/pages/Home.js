@@ -1,25 +1,22 @@
 // client/src/pages/Home.js
 import React, { useEffect, useState } from 'react';
-import AudiobookCard from '../components/AudiobookCard';
+import axios from 'axios';
+import CustomCarousel from '../components/Carousel';
+import '../styles/pages/Home.css';
 
 const Home = () => {
-  const [audiobooks, setAudiobooks] = useState([]);
-  const [error, setError] = useState(null);
+  const [recentlyAdded, setRecentlyAdded] = useState([]);
+  const [recommended, setRecommended] = useState([]);
 
   useEffect(() => {
     const fetchAudiobooks = async () => {
       try {
-        const response = await fetch('/api/audiobooks'); // Relative URL
-        console.log('Response:', response); // Log the response
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-        console.log('Data:', data); // Log the data
-        setAudiobooks(data);
+        const recent = await axios.get('/api/audiobooks/recent');
+        const recommend = await axios.get('/api/audiobooks/recommended');
+        setRecentlyAdded(recent.data);
+        setRecommended(recommend.data);
       } catch (error) {
-        console.error('Failed to fetch audiobooks:', error);
-        setError(error.message);
+        console.error('Error fetching audiobooks:', error);
       }
     };
 
@@ -27,14 +24,9 @@ const Home = () => {
   }, []);
 
   return (
-    <div className="home">
-      <h1>Audiobooks</h1>
-      {error && <p>Error: {error}</p>}
-      <div className="audiobook-list">
-        {audiobooks.map(audiobook => (
-          <AudiobookCard key={audiobook._id} audiobook={audiobook} />
-        ))}
-      </div>
+    <div className="home-page">
+      <CustomCarousel title="Recently Added" audiobooks={recentlyAdded} />
+      <CustomCarousel title="Recommended for You" audiobooks={recommended} />
     </div>
   );
 };
