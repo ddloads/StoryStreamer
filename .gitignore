@@ -6,3 +6,5 @@
 
 # Build output
 client/build
+
+server/public/covers
