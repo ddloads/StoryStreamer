@@ -1,87 +1,83 @@
-// server/src/utils/scanDirectory.js
-import fs from 'fs/promises';
+import fs from 'fs';
 import path from 'path';
 import { parseFile } from 'music-metadata';
-import sharp from 'sharp';
 import Audiobook from '../models/audiobook.js';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
+import logger from '../utils/logger.js';
 
-// Equivalent of __dirname in ES modules
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-const audioExtensions = ['.mp3', '.m4b', '.m4a', '.aac', '.ogg', '.wma', '.flac', '.alac', '.wav'];
-
-function isAudiobookFile(file) {
-  return audioExtensions.includes(path.extname(file).toLowerCase());
-}
-
-async function saveCoverImage(imageBuffer, title) {
-  const sanitizedTitle = title.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-  const fileName = `${sanitizedTitle}.png`;
-  const filePath = path.join(__dirname, '../../public/covers', fileName);
-
-  await sharp(imageBuffer).toFormat('png').toFile(filePath);
-  return `/covers/${fileName}`;
-}
-
-async function scanDirectory(dir, onProgress) {
-  const files = await fs.readdir(dir);
-  const audiobooks = new Map();
-
-  for (const file of files) {
-    const filePath = path.join(dir, file);
-    const stats = await fs.stat(filePath);
-
-    if (stats.isDirectory()) {
-      const subDirectoryAudiobooks = await scanDirectory(filePath, onProgress);
-      subDirectoryAudiobooks.forEach((value, key) => audiobooks.set(key, value));
-    } else if (stats.isFile() && isAudiobookFile(file)) {
-      const bookName = path.basename(path.dirname(filePath));
-      let metadata = {};
-
-      try {
-        const fileMetadata = await parseFile(filePath);
-        let coverImagePath = null;
-        if (fileMetadata.common.picture && fileMetadata.common.picture[0]) {
-          const picture = fileMetadata.common.picture[0];
-          coverImagePath = await saveCoverImage(picture.data, fileMetadata.common.title || bookName);
-        }
-        metadata = {
-          title: fileMetadata.common.title || bookName,
-          author: fileMetadata.common.artist || 'Unknown',
-          narrator: fileMetadata.common.artist || 'Unknown',
-          publishYear: fileMetadata.common.year || 'N/A',
-          publisher: fileMetadata.common.label || 'N/A',
-          genres: fileMetadata.common.genre || [],
-          tags: fileMetadata.common.genre || [],
-          language: fileMetadata.common.language || 'N/A',
-          duration: fileMetadata.format.duration ? `${Math.floor(fileMetadata.format.duration / 3600)} hr ${Math.floor((fileMetadata.format.duration % 3600) / 60)} min` : 'N/A',
-          filepath: [filePath],
-          coverImage: coverImagePath,
-          description: fileMetadata.common.comment ? fileMetadata.common.comment[0] : '',
-          format: path.extname(file).toLowerCase().slice(1),
-          fileSize: `${(stats.size / (1024 * 1024)).toFixed(2)} MB`,
-          isbn: fileMetadata.common.isbn || 'N/A',
-          rating: 0,
-          reviews: [],
-          chapters: fileMetadata.common.chapters || []
-        };
-      } catch (err) {
-        console.error(`Error reading metadata for file ${filePath}:`, err);
-      }
-
-      if (!audiobooks.has(bookName)) {
-        audiobooks.set(bookName, metadata);
-      } else {
-        audiobooks.get(bookName).filepath.push(filePath);
-      }
-      onProgress(filePath);
-    }
+// Ensure the covers directory exists
+const ensureCoversDirectoryExists = async () => {
+  const coversDir = path.join(__dirname, '../public/covers');
+  try {
+    await fs.promises.access(coversDir);
+  } catch (error) {
+    await fs.promises.mkdir(coversDir, { recursive: true });
+    logger.info(`Covers directory created at ${coversDir}`);
   }
+};
 
-  return audiobooks;
-}
+// Function to save cover image to a specific path
+const saveCoverImage = async (cover, title) => {
+  await ensureCoversDirectoryExists();
+  const coverImagePath = path.join(__dirname, '../public/covers', `${title.replace(/[^a-zA-Z0-9]/g, '_')}.png`);
+  try {
+    await fs.promises.writeFile(coverImagePath, cover);
+    return `/covers/${title.replace(/[^a-zA-Z0-9]/g, '_')}.png`;
+  } catch (error) {
+    logger.error(`Error saving cover image for ${title}: ${error.message}`);
+    throw new Error(`Error saving cover image for ${title}`);
+  }
+};
+
+// Function to scan a directory and extract metadata for audiobooks
+const scanDirectory = async (directory, libraryName) => {
+  try {
+    const files = await fs.promises.readdir(directory);
+    for (const file of files) {
+      const filePath = path.join(directory, file);
+      const stat = await fs.promises.stat(filePath);
+
+      if (stat.isDirectory()) {
+        // Recursively scan subdirectories
+        await scanDirectory(filePath, libraryName);
+      } else if (stat.isFile() && /\.(mp3|m4b|m4a|aac|ogg|wma|flac|alac|wav)$/i.test(file)) {
+        try {
+          const metadata = await parseFile(filePath);
+          const { title, artist, album, year, genre, comment, picture } = metadata.common;
+          const duration = metadata.format.duration;
+
+          const existingAudiobook = await Audiobook.findOne({ filepath: filePath });
+          const newAudiobookData = {
+            title: title || path.basename(file, path.extname(file)),
+            author: artist || 'Unknown',
+            series: album || 'Unknown',
+            narrator: comment ? comment[0] : 'Unknown',
+            publishYear: year || 'Unknown',
+            genres: genre || [],
+            duration,
+            filepath: filePath,
+            coverImage: picture ? await saveCoverImage(picture[0].data, title) : null,
+            description: 'No description available',
+            dateAdded: new Date(),
+            library: libraryName
+          };
+
+          if (!existingAudiobook) {
+            const audiobook = new Audiobook(newAudiobookData);
+            await audiobook.save();
+            logger.info(`Added new audiobook: ${audiobook.title}`);
+          } else {
+            Object.assign(existingAudiobook, newAudiobookData);
+            await existingAudiobook.save();
+            logger.info(`Updated existing audiobook: ${existingAudiobook.title}`);
+          }
+        } catch (error) {
+          logger.error(`Error reading metadata for file ${filePath}: ${error.message}`);
+        }
+      }
+    }
+  } catch (error) {
+    logger.error(`Error scanning directory ${directory}: ${error.message}`);
+  }
+};
 
 export default scanDirectory;

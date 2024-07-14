@@ -1,4 +1,3 @@
-// server/src/index.js
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
@@ -7,13 +6,19 @@ import { fileURLToPath } from 'url';
 import connectDB from './config/database.js';
 import audiobookRoutes from './routes/audiobookRoutes.js';
 import userRoutes from './routes/userRoutes.js';
+import audioRoutes from './routes/audioRoutes.js';
 
 dotenv.config();
 
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:3000', // or whatever your frontend URL is
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 app.use(express.json());
 
 // Connect to database
@@ -29,6 +34,7 @@ app.use(express.static(path.join(path.resolve(), 'public')));
 // Routes
 app.use('/api/audiobooks', audiobookRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/audio', audioRoutes);
 
 // Test Route
 app.get('/', (req, res) => {

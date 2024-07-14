@@ -1,6 +1,4 @@
-// client/src/pages/Library.js
 import React, { useState, useEffect } from 'react';
-import '../styles/pages/Library.css';
 import AudiobookCard from '../components/AudiobookCard';
 
 const Library = () => {
@@ -21,9 +19,9 @@ const Library = () => {
   }, []);
 
   return (
-    <div className="library">
-      <h1>Library</h1>
-      <div className="audiobooks-grid">
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-6 text-gray-800">Library</h1>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {audiobooks.map(audiobook => (
           <AudiobookCard key={audiobook._id} audiobook={audiobook} />
         ))}
@@ -32,4 +30,4 @@ const Library = () => {
   );
 };
 
-export default Library; // Ensure this is a default export
+export default Library;

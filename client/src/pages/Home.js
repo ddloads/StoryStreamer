@@ -1,10 +1,9 @@
-// client/src/pages/Home.js
+// Home.js
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import CustomCarousel from '../components/Carousel';
-import '../styles/pages/Home.css';
 
-const Home = () => {
+const Home = ({ isDarkMode }) => {
   const [recentlyAdded, setRecentlyAdded] = useState([]);
   const [recommended, setRecommended] = useState([]);
 
@@ -24,9 +23,15 @@ const Home = () => {
   }, []);
 
   return (
-    <div className="home-page">
-      <CustomCarousel title="Recently Added" audiobooks={recentlyAdded} />
-      <CustomCarousel title="Recommended for You" audiobooks={recommended} />
+    <div className={`space-y-8 ${isDarkMode ? 'dark' : ''}`}>
+      <section>
+        <h2 className="text-2xl font-bold mb-4 dark:text-white">Recently Added</h2>
+        <CustomCarousel audiobooks={recentlyAdded} />
+      </section>
+      <section>
+        <h2 className="text-2xl font-bold mb-4 dark:text-white">Recommended for You</h2>
+        <CustomCarousel audiobooks={recommended} />
+      </section>
     </div>
   );
 };
